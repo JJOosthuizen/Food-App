@@ -1,5 +1,4 @@
 from tkinter import *
-from tkinter import ttk
 from tkinter import scrolledtext
 import json
 import re
@@ -45,9 +44,6 @@ class AppScreen(Tk):
 
     def show_result(self):
         """Function that displays the 6 results to the user"""
-
-        # self.lbl_item1.grid(row=1, column=1, columnspan=4)
-
         titles, images = self.read_recipes()
 
         self.button_list = []
@@ -96,6 +92,10 @@ class AppScreen(Tk):
 
     def view_recipe(self, button_id):
         """Function that displays the recipe of the dish"""
+        self.make_view_recipe_GUI(button_id)
+
+    def make_view_recipe_GUI(self, button_id):
+        """Function that creates the GUI for viewing a dish"""
         title, instructions, ingredients = connect.view_requested_recipe(button_id)
         # remove old GUI components
         for i in range(len(self.button_list)):
@@ -128,52 +128,67 @@ class AppScreen(Tk):
             self.view_right_frame, text=f"{title}'s Required Ingredients:"
         )
         self.lbl_right.pack()
-        text = scrolledtext.ScrolledText(
+        self.text = scrolledtext.ScrolledText(
             self.view_right_frame, wrap=WORD, height=10, state="disabled"
         )
         # create the text component
-        text.pack()
-        text.configure(state="normal")
+        self.text.pack()
+        self.text.configure(state="normal")
 
         for item in ingredients:
             ingredient = item["original"]
-            text.insert("end", f"•  {ingredient}\n")
+            self.text.insert("end", f"•  {ingredient}\n")
         # disable to stop editing
-        text.configure(state="disabled")
+        self.text.configure(state="disabled")
 
         self.view_bottom_frame = Frame(
-            width=self.screen_width / 2, height=self.screen_height / 3
+            width=self.screen_width, height=self.screen_height / 3
         )
-        self.view_bottom_frame.grid(row=2, column=1)
+        self.view_bottom_frame.grid(row=2, column=0, columnspan=2, padx=5, pady=10)
         self.lbl_heading_instructions = Label(
             self.view_bottom_frame, text=f"{title}'s Instructions:"
         )
         self.lbl_heading_instructions.pack()
-        # self.lbl_instructions = Label(self.view_bottom_frame, text=instructions)
-        # self.lbl_instructions.pack()
+
+        # removes and splits instructions
+        instructions_output = self.split_instructions(instructions)
 
         # Create a Text widget
-        text_widget = Text(self.view_bottom_frame, state=NORMAL, wrap=WORD)
+        self.text_widget = scrolledtext.ScrolledText(
+            self.view_bottom_frame, state=NORMAL, wrap=WORD, height=15
+        )
 
         # Insert text into the widget
-        # instructions_list = self.split_instructions(instructions)
-        # print(instructions_list)
-        # for item in instructions_list:
-        instructions_output = self.split_instructions(instructions)
         for item in instructions_output:
-            text_widget.insert(END, f"{item}.\n")
+            self.text_widget.insert(END, f"• {item}.\n")
 
         # Pack the Text widget
-        text_widget.configure(state=DISABLED)
-        text_widget.pack()
+        self.text_widget.configure(state=DISABLED)
+        self.text_widget.pack()
+
+        self.button_frame = Frame(
+            width=self.screen_width, height=self.screen_height / 3
+        )
+        self.button_frame.grid(row=3, column=0, columnspan=2, padx=5, pady=10)
+        self.btn_main_menu = Button(
+            self.button_frame, text="Main Menu!", command=self.main_menu
+        )
+        self.btn_main_menu.pack(side=LEFT)
+        self.btn_quit = Button(
+            self.button_frame, text="Quit 0_o", command=self.close_program
+        )
+        self.btn_quit.pack(side=RIGHT)
 
     def split_instructions(self, instructions):
-        """Functions that removes all HTML markup and splits sentences"""
+        """Functions that removes all HTML markup and splits sentences
+        *   :returns sentences (__list__)"""
         clean_string = re.sub("<[^<]+?>", "", instructions)
         sentences = re.split("\. ", clean_string)
         return sentences
 
     def read_recipes(self):
+        """Function that gets the title and images of the 6 recipes
+        *   :return titles (__list__) images (__list__):"""
         try:
             titles = []
             images = []
@@ -185,6 +200,16 @@ class AppScreen(Tk):
             return titles, images
         except FileNotFoundError:
             print("error")
+
+    def close_program(self):
+        """Function that closes the program when the quit button is clicked"""
+        self.destroy()
+
+    def main_menu(self):
+        """Function that 'reruns' the app by destroying the current one and calling the class object"""
+        self.destroy()
+        app = AppScreen()
+        app.mainloop()
 
 
 if __name__ == "__main__":
