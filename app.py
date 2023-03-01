@@ -19,8 +19,12 @@ class AppScreen(Tk):
 
     def home_screen(self):
         """Function that adds all the GUI elements to the homescreen"""
-        self.label = Label(self, text="Welcome to J-Cuisine!")
-        self.label_search = Label(self, text="Lookup a recipe for...")
+        self.label = Label(
+            self, text="Welcome to J-Cuisine!", pady=15, font=("Arial", 20, "italic")
+        )
+        self.label_search = Label(
+            self, text="Lookup a recipe for...", font=("Arial", 12, "bold"), pady=5
+        )
         self.label.pack()
         self.label_search.pack()
 
@@ -34,7 +38,7 @@ class AppScreen(Tk):
         """Function that looksup 6 results based on user input"""
         connect.fetch_data(self.search_box.get())
         # updating text
-        self.label.config(text="Here are 6 result from the search you provided!")
+        # self.label.config(text="Here are 6 result from the search you provided!")
         # removing
         self.label.destroy()
         self.search_box.destroy()
@@ -61,11 +65,13 @@ class AppScreen(Tk):
             )
             self.frame.grid(row=i // 3, column=i % 3, padx=10, pady=5)
 
-            self.frame_label = Label(self.frame, text=titles[i])
+            self.frame_label = Label(
+                self.frame, text=titles[i], font=("Arial", 12, "bold"), wraplength=200
+            )
             self.frame_label.pack(padx=5, pady=10)
             self.frame_list.append(self.frame)
             self.title_list.append(self.frame_label)
-            # image_data = urllib.request.urlopen(images[i]).read()
+
             headers = {"User-Agent": "Mozilla/5.0"}
             response = requests.get(images[i], headers=headers)
 
