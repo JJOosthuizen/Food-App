@@ -98,12 +98,7 @@ class AppScreen(Tk):
             self.title_list[i].destroy()
             self.frame_list[i].destroy()
 
-        try:
-            with open("recipes.json", "r") as f:
-                data = json.load(f)
-        except FileNotFoundError as e:
-            print(e)
-        print(button_id)
+        connect.view_requested_recipe(button_id)
 
     def read_recipes(self):
         try:
