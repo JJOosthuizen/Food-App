@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import scrolledtext
 import json
-import urllib.request
+import re
 import requests
 import components.connect as connect
 import io
@@ -103,7 +103,9 @@ class AppScreen(Tk):
             self.title_list[i].destroy()
             self.frame_list[i].destroy()
 
-        self.view_left_frame = Frame(width=self.screen_width, height=self.screen_height)
+        self.view_left_frame = Frame(
+            width=self.screen_width, height=self.screen_height / 2
+        )
         self.view_left_frame.grid(row=1, column=0, padx=25)
 
         self.lbl_title = Label(self.view_left_frame, text=title)
@@ -118,7 +120,7 @@ class AppScreen(Tk):
         self.frame_img.pack()
 
         self.view_right_frame = Frame(
-            width=self.screen_width, height=self.screen_height
+            width=self.screen_width, height=self.screen_height / 2
         )
         self.view_right_frame.grid(row=1, column=1)
 
@@ -134,10 +136,42 @@ class AppScreen(Tk):
         text.configure(state="normal")
 
         for item in ingredients:
-            ingredient = item["name"]
+            ingredient = item["original"]
             text.insert("end", f"•  {ingredient}\n")
         # disable to stop editing
         text.configure(state="disabled")
+
+        self.view_bottom_frame = Frame(
+            width=self.screen_width / 2, height=self.screen_height / 3
+        )
+        self.view_bottom_frame.grid(row=2, column=1)
+        self.lbl_heading_instructions = Label(
+            self.view_bottom_frame, text=f"{title}'s Instructions:"
+        )
+        self.lbl_heading_instructions.pack()
+        # self.lbl_instructions = Label(self.view_bottom_frame, text=instructions)
+        # self.lbl_instructions.pack()
+
+        # Create a Text widget
+        text_widget = Text(self.view_bottom_frame, state=NORMAL, wrap=WORD)
+
+        # Insert text into the widget
+        # instructions_list = self.split_instructions(instructions)
+        # print(instructions_list)
+        # for item in instructions_list:
+        instructions_output = self.split_instructions(instructions)
+        for item in instructions_output:
+            text_widget.insert(END, f"{item}.\n")
+
+        # Pack the Text widget
+        text_widget.configure(state=DISABLED)
+        text_widget.pack()
+
+    def split_instructions(self, instructions):
+        """Functions that removes all HTML markup and splits sentences"""
+        clean_string = re.sub("<[^<]+?>", "", instructions)
+        sentences = re.split("\. ", clean_string)
+        return sentences
 
     def read_recipes(self):
         try:
