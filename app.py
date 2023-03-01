@@ -1,5 +1,6 @@
 from tkinter import *
-
+from tkinter import ttk
+from tkinter import scrolledtext
 import json
 import urllib.request
 import requests
@@ -12,6 +13,8 @@ class AppScreen(Tk):
     def __init__(self):
         super().__init__()
         self.title("J-Cuisine!")
+        self.screen_width = 1024
+        self.screen_height = 700
         self.geometry("1024x700")
         self.home_screen()
 
@@ -45,20 +48,18 @@ class AppScreen(Tk):
 
         # self.lbl_item1.grid(row=1, column=1, columnspan=4)
 
-        screen_width = 1024
-        screen_height = 700
         titles, images = self.read_recipes()
 
         self.button_list = []
         self.title_list = []
         self.frame_list = []
-
+        self.frame_img_list = []
         for i in range(6):
             # 3 x 3 grid per frame
             self.frame = Frame(
                 self,
-                width=screen_width / 3,
-                height=screen_height / 3,
+                width=self.screen_width / 3,
+                height=self.screen_height / 3,
                 bd=1,
                 relief="solid",
             )
@@ -76,11 +77,14 @@ class AppScreen(Tk):
             recipe_image = Image.open(io.BytesIO(response.content))
 
             # Convert the PIL image to a Tkinter-compatible format
-            tk_image = ImageTk.PhotoImage(recipe_image)
+            self.tk_image = ImageTk.PhotoImage(recipe_image)
 
-            self.frame_img = Label(self.frame, image=tk_image)
-            self.frame_img.image = tk_image  # <== anchor to display image, idk why KEKW
+            self.frame_img = Label(self.frame, image=self.tk_image)
+            self.frame_img.image = (
+                self.tk_image
+            )  # <== anchor to display image, idk why KEKW
             self.frame_img.pack()
+            self.frame_img_list.append(self.tk_image)
 
             self.button = Button(
                 self.frame,
@@ -92,13 +96,48 @@ class AppScreen(Tk):
 
     def view_recipe(self, button_id):
         """Function that displays the recipe of the dish"""
+        title, instructions, ingredients = connect.view_requested_recipe(button_id)
         # remove old GUI components
         for i in range(len(self.button_list)):
             self.button_list[i].destroy()
             self.title_list[i].destroy()
             self.frame_list[i].destroy()
 
-        connect.view_requested_recipe(button_id)
+        self.view_left_frame = Frame(width=self.screen_width, height=self.screen_height)
+        self.view_left_frame.grid(row=1, column=0, padx=25)
+
+        self.lbl_title = Label(self.view_left_frame, text=title)
+        self.lbl_title.pack()
+
+        self.frame_img = Label(
+            self.view_left_frame, image=self.frame_img_list[button_id]
+        )
+        self.frame_img.image = self.frame_img_list[
+            button_id
+        ]  # <== anchor to display image, idk why KEKW
+        self.frame_img.pack()
+
+        self.view_right_frame = Frame(
+            width=self.screen_width, height=self.screen_height
+        )
+        self.view_right_frame.grid(row=1, column=1)
+
+        self.lbl_right = Label(
+            self.view_right_frame, text=f"{title}'s Required Ingredients:"
+        )
+        self.lbl_right.pack()
+        text = scrolledtext.ScrolledText(
+            self.view_right_frame, wrap=WORD, height=10, state="disabled"
+        )
+        # create the text component
+        text.pack()
+        text.configure(state="normal")
+
+        for item in ingredients:
+            ingredient = item["name"]
+            text.insert("end", f"•  {ingredient}\n")
+        # disable to stop editing
+        text.configure(state="disabled")
 
     def read_recipes(self):
         try:
