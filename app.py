@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import scrolledtext
+from tkinter import ttk
 import json
 import re
 import requests
@@ -34,6 +35,16 @@ class AppScreen(Tk):
         self.btn_lookup = Button(self, text="Lookup!", command=self.lookup_recipe)
         self.btn_lookup.pack()
 
+        self.lbl_note = Label(
+            self,
+            text="Note that when the field is open that it will give random recipes",
+            font=("Arial", 8, "italic bold underline"),
+            pady=10,
+            underline=0,
+        )
+
+        self.lbl_note.pack()
+
     def lookup_recipe(self):
         """Function that looksup 6 results based on user input"""
         connect.fetch_data(self.search_box.get())
@@ -44,6 +55,7 @@ class AppScreen(Tk):
         self.search_box.destroy()
         self.label_search.destroy()
         self.btn_lookup.destroy()
+        self.lbl_note.destroy()
         self.show_result()
 
     def show_result(self):
@@ -102,19 +114,34 @@ class AppScreen(Tk):
 
     def make_view_recipe_GUI(self, button_id):
         """Function that creates the GUI for viewing a dish"""
-        title, instructions, ingredients = connect.view_requested_recipe(button_id)
+
         # remove old GUI components
         for i in range(len(self.button_list)):
             self.button_list[i].destroy()
             self.title_list[i].destroy()
             self.frame_list[i].destroy()
 
+        self.load_frame = Frame(width=self.screen_width, height=self.screen_height / 2)
+        self.load_frame.grid(row=1, column=1, columnspan=2, pady=10)
+        self.progressbar = ttk.Progressbar(
+            self.load_frame, orient="horizontal", length=200, mode="indeterminate"
+        )
+        self.progressbar.pack()
+        self.progressbar.start()
+
+        title, instructions, ingredients = connect.view_requested_recipe(button_id)
+
         self.view_left_frame = Frame(
             width=self.screen_width, height=self.screen_height / 2
         )
         self.view_left_frame.grid(row=1, column=0, padx=25)
 
-        self.lbl_title = Label(self.view_left_frame, text=title)
+        self.lbl_title = Label(
+            self.view_left_frame,
+            text=title,
+            font=("Arial", 14, "underline"),
+            underline=0,
+        )
         self.lbl_title.pack()
 
         self.frame_img = Label(
@@ -131,7 +158,10 @@ class AppScreen(Tk):
         self.view_right_frame.grid(row=1, column=1)
 
         self.lbl_right = Label(
-            self.view_right_frame, text=f"{title}'s Required Ingredients:"
+            self.view_right_frame,
+            text=f"{title}'s Required Ingredients:",
+            font=("bold", 14, "underline"),
+            underline=0,
         )
         self.lbl_right.pack()
         self.text = scrolledtext.ScrolledText(
@@ -152,7 +182,10 @@ class AppScreen(Tk):
         )
         self.view_bottom_frame.grid(row=2, column=0, columnspan=2, padx=5, pady=10)
         self.lbl_heading_instructions = Label(
-            self.view_bottom_frame, text=f"{title}'s Instructions:"
+            self.view_bottom_frame,
+            text=f"{title}'s Instructions:",
+            font=("bold", 14, "underline"),
+            underline=0,
         )
         self.lbl_heading_instructions.pack()
 
@@ -184,6 +217,10 @@ class AppScreen(Tk):
             self.button_frame, text="Quit 0_o", command=self.close_program
         )
         self.btn_quit.pack(side=RIGHT)
+
+        self.progressbar.stop()
+        self.progressbar.destroy()
+        self.load_frame.destroy()
 
     def split_instructions(self, instructions):
         """Functions that removes all HTML markup and splits sentences
