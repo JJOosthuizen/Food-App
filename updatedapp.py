@@ -143,7 +143,7 @@ class App(customtkinter.CTk):
 
         title, instructions, ingredients = connect.view_requested_recipe(btn_id)
 
-        # LEFT SIDE
+        # TOP LEFT SIDE
         self.lbl_title = customtkinter.CTkLabel(
             self.detail_frame,
             text=title,
@@ -158,7 +158,7 @@ class App(customtkinter.CTk):
 
         self.detail_img.grid(row=1, column=0)
 
-        # RIGHT SIDE
+        # TOP RIGHT SIDE
         self.lbl_ingredients = customtkinter.CTkLabel(
             self.detail_frame,
             text=f"{title}'s Required Ingredients:",
@@ -166,14 +166,41 @@ class App(customtkinter.CTk):
         )
         self.lbl_ingredients.grid(row=0, column=1)
 
-        self.textbox = customtkinter.CTkTextbox(self.detail_frame, width=300)
-        self.textbox.grid(row=1, column=1, padx=40, pady=20, sticky="nsew")
+        self.ingredient_textbox = customtkinter.CTkTextbox(
+            self.detail_frame, width=300, font=customtkinter.CTkFont(size=14)
+        )
+        self.ingredient_textbox.grid(row=1, column=1, padx=40, pady=20, sticky="nsew")
 
         for item in ingredients:
             ingredient = item["original"]
-            self.textbox.insert("end", f"•  {ingredient}\n")
+            self.ingredient_textbox.insert("end", f"•  {ingredient}\n")
         # disable to stop editing
-        self.textbox.configure(state="disabled")
+        self.ingredient_textbox.configure(state="disabled")
+
+        # BOTTOM SIDE
+        self.lbl_instructions = customtkinter.CTkLabel(
+            self.detail_frame,
+            text=f"{title}'s Instructions:",
+            font=customtkinter.CTkFont(size=16, weight="bold"),
+        )
+        self.lbl_instructions.grid(row=3, column=0, columnspan=3, pady=(15, 0))
+
+        self.instructions_textbox = customtkinter.CTkTextbox(
+            self.detail_frame, width=300, font=customtkinter.CTkFont(size=14)
+        )
+        self.instructions_textbox.grid(
+            row=4, column=0, columnspan=3, padx=40, pady=20, sticky="nsew"
+        )
+
+    def close_program(self):
+        """Function that closes the program when the quit button is clicked"""
+        self.destroy()
+
+    def main_menu(self):
+        """Function that 'reruns' the app by destroying the current one and calling the class object"""
+        self.destroy()
+        app = App()
+        app.mainloop()
 
     def read_recipes(self):
         """Function that gets the title and images of the 6 recipes
