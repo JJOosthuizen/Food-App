@@ -94,16 +94,14 @@ class AppScreen(Tk):
             self.tk_image = ImageTk.PhotoImage(recipe_image)
 
             self.frame_img = Label(self.frame, image=self.tk_image)
-            self.frame_img.image = (
-                self.tk_image
-            )  # <== anchor to display image, idk why KEKW
+            self.frame_img.image = self.tk_image  # <== anchor to display image
             self.frame_img.pack()
             self.frame_img_list.append(self.tk_image)
 
             self.button = Button(
                 self.frame,
                 text="View Recipe!",
-                command=lambda num=i: self.view_recipe(num),
+                command=lambda btn_id=i: self.view_recipe(btn_id),
             )
             self.button_list.append(self.button)
             self.button.pack(pady=5)
@@ -149,7 +147,7 @@ class AppScreen(Tk):
         )
         self.frame_img.image = self.frame_img_list[
             button_id
-        ]  # <== anchor to display image, idk why KEKW
+        ]  # <== anchor to display image
         self.frame_img.pack()
 
         self.view_right_frame = Frame(
