@@ -3,8 +3,9 @@ import customtkinter
 import requests
 import components.connect as connect
 import io
-from PIL import Image, ImageTk
+from PIL import Image
 import json
+import re
 
 customtkinter.set_appearance_mode(
     "System"
@@ -185,12 +186,36 @@ class App(customtkinter.CTk):
         )
         self.lbl_instructions.grid(row=3, column=0, columnspan=3, pady=(15, 0))
 
+        # removes and splits instructions
+        instructions_output = self.split_instructions(instructions)
+
+        # Create a Text widget
         self.instructions_textbox = customtkinter.CTkTextbox(
-            self.detail_frame, width=300, font=customtkinter.CTkFont(size=14)
+            self.detail_frame, width=300, font=customtkinter.CTkFont(size=16)
         )
         self.instructions_textbox.grid(
             row=4, column=0, columnspan=3, padx=40, pady=20, sticky="nsew"
         )
+
+        # Insert text into the widget
+        for item in instructions_output:
+            self.instructions_textbox.insert(END, f"• {item}.\n")
+
+        # Pack the Text widget
+        self.instructions_textbox.configure(state="disabled")
+
+        # Buttons
+        self.lookup_button = customtkinter.CTkButton(
+            self.home_frame, text="Lookup", command=self.lookup_recipe
+        )
+        self.lookup_button.grid(row=3, column=3, padx=20, pady=10)
+
+    def split_instructions(self, instructions):
+        """Functions that removes all HTML markup and splits sentences
+        *   :returns sentences (__list__)"""
+        clean_string = re.sub("<[^<]+?>", "", instructions)
+        sentences = re.split("\. ", clean_string)
+        return sentences
 
     def close_program(self):
         """Function that closes the program when the quit button is clicked"""
