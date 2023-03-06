@@ -91,6 +91,7 @@ class App(customtkinter.CTk):
         self.view_frame.grid_rowconfigure((0, 1, 2), weight=1)
         self.view_frame.grid_columnconfigure((0, 1, 2), weight=1)
 
+        self.image_list = []
         for i in range(6):
             self.recipe_frame = customtkinter.CTkFrame(self.view_frame, corner_radius=0)
             self.recipe_frame.grid(row=i // 3, column=i % 3, pady=10)
@@ -109,11 +110,10 @@ class App(customtkinter.CTk):
                 justify="center",
             )
             self.recipe_label.pack()
+            recipe_img = Image.open(io.BytesIO(response.content))
+            self.tk_image = customtkinter.CTkImage(recipe_img, size=(330, 220))
 
-            self.tk_image = customtkinter.CTkImage(
-                Image.open(io.BytesIO(response.content)),
-                size=(330, 220),
-            )
+            self.image_list.append(recipe_img)
 
             # Convert the PIL image to a Tkinter-compatible format
             # self.tk_image = ImageTk.PhotoImage(recipe_image)
@@ -134,7 +134,46 @@ class App(customtkinter.CTk):
             self.recipe_button.pack(pady=5)
 
     def view_recipe(self, btn_id):
-        print(btn_id)
+        self.view_frame.destroy()
+
+        self.detail_frame = customtkinter.CTkFrame(self, width=350, corner_radius=0)
+        self.detail_frame.grid(row=0, column=0, rowspan=5, columnspan=4, sticky="nsew")
+        self.detail_frame.grid_rowconfigure((0, 1, 2, 3, 4), weight=0)
+        self.detail_frame.grid_columnconfigure((0, 1, 2), weight=1)
+
+        title, instructions, ingredients = connect.view_requested_recipe(btn_id)
+
+        # LEFT SIDE
+        self.lbl_title = customtkinter.CTkLabel(
+            self.detail_frame,
+            text=title,
+            font=customtkinter.CTkFont(size=14, weight="bold"),
+        )
+        self.lbl_title.grid(row=0, column=0)
+
+        food_img = customtkinter.CTkImage(self.image_list[btn_id], size=(330, 220))
+        self.detail_img = customtkinter.CTkLabel(
+            self.detail_frame, text="", image=food_img
+        )
+
+        self.detail_img.grid(row=1, column=0)
+
+        # RIGHT SIDE
+        self.lbl_ingredients = customtkinter.CTkLabel(
+            self.detail_frame,
+            text=f"{title}'s Required Ingredients:",
+            font=customtkinter.CTkFont(size=14, weight="bold"),
+        )
+        self.lbl_ingredients.grid(row=0, column=1)
+
+        self.textbox = customtkinter.CTkTextbox(self.detail_frame, width=300)
+        self.textbox.grid(row=1, column=1, padx=40, pady=20, sticky="nsew")
+
+        for item in ingredients:
+            ingredient = item["original"]
+            self.textbox.insert("end", f"•  {ingredient}\n")
+        # disable to stop editing
+        self.textbox.configure(state="disabled")
 
     def read_recipes(self):
         """Function that gets the title and images of the 6 recipes
