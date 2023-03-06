@@ -33,7 +33,7 @@ class App(customtkinter.CTk):
         # home screen frames
         self.home_frame = customtkinter.CTkFrame(self, width=350, corner_radius=0)
         self.home_frame.grid(row=0, column=0, rowspan=4, columnspan=4, sticky="nsew")
-        self.home_frame.grid_rowconfigure(5, weight=1)
+        self.home_frame.grid_rowconfigure(7, weight=1)
         self.home_frame.grid_columnconfigure(3, weight=1)
 
         # home screen main label
@@ -71,6 +71,20 @@ class App(customtkinter.CTk):
             ),
         )
         self.note_label.grid(row=4, column=3)
+
+        # THEME BUTTON
+        self.theme_button = customtkinter.CTkButton(
+            self.home_frame,
+            text="Change Color Theme",
+            command=self.change_color_theme,
+        )
+        self.theme_button.grid(row=5, column=3, pady=20)
+
+        # QUIT BUTTON
+        self.quit_button = customtkinter.CTkButton(
+            self.home_frame, text="Quit 0_o", command=self.close_program
+        )
+        self.quit_button.grid(row=6, column=3, pady=10)
 
     # LOOKUP RECIPE SECTION
     def lookup_recipe(self):
@@ -150,7 +164,7 @@ class App(customtkinter.CTk):
             text=title,
             font=customtkinter.CTkFont(size=14, weight="bold"),
         )
-        self.lbl_title.grid(row=0, column=0)
+        self.lbl_title.grid(row=0, column=0, pady=10)
 
         food_img = customtkinter.CTkImage(self.image_list[btn_id], size=(330, 220))
         self.detail_img = customtkinter.CTkLabel(
@@ -165,7 +179,7 @@ class App(customtkinter.CTk):
             text=f"{title}'s Required Ingredients:",
             font=customtkinter.CTkFont(size=14, weight="bold"),
         )
-        self.lbl_ingredients.grid(row=0, column=1, columnspan=2)
+        self.lbl_ingredients.grid(row=0, column=1, columnspan=2, pady=10)
 
         self.ingredient_textbox = customtkinter.CTkTextbox(
             self.detail_frame, width=300, font=customtkinter.CTkFont(size=14)
@@ -186,7 +200,7 @@ class App(customtkinter.CTk):
             text=f"{title}'s Instructions:",
             font=customtkinter.CTkFont(size=16, weight="bold"),
         )
-        self.lbl_instructions.grid(row=3, column=0, columnspan=3, pady=(15, 0))
+        self.lbl_instructions.grid(row=3, column=0, columnspan=3, pady=(10, 0))
 
         # removes and splits instructions
         instructions_output = self.split_instructions(instructions)
@@ -196,7 +210,7 @@ class App(customtkinter.CTk):
             self.detail_frame, width=300, font=customtkinter.CTkFont(size=16)
         )
         self.instructions_textbox.grid(
-            row=4, column=0, columnspan=3, padx=40, pady=20, sticky="nsew"
+            row=4, column=0, columnspan=3, padx=40, pady=15, sticky="nsew"
         )
 
         # Insert text into the widget
