@@ -157,7 +157,7 @@ class App(customtkinter.CTk):
             self.detail_frame, text="", image=food_img
         )
 
-        self.detail_img.grid(row=1, column=0)
+        self.detail_img.grid(row=1, column=0, pady=10)
 
         # TOP RIGHT SIDE
         self.lbl_ingredients = customtkinter.CTkLabel(
@@ -165,12 +165,14 @@ class App(customtkinter.CTk):
             text=f"{title}'s Required Ingredients:",
             font=customtkinter.CTkFont(size=14, weight="bold"),
         )
-        self.lbl_ingredients.grid(row=0, column=1)
+        self.lbl_ingredients.grid(row=0, column=1, columnspan=2)
 
         self.ingredient_textbox = customtkinter.CTkTextbox(
             self.detail_frame, width=300, font=customtkinter.CTkFont(size=14)
         )
-        self.ingredient_textbox.grid(row=1, column=1, padx=40, pady=20, sticky="nsew")
+        self.ingredient_textbox.grid(
+            row=1, column=1, columnspan=2, padx=40, pady=10, sticky="nsew"
+        )
 
         for item in ingredients:
             ingredient = item["original"]
@@ -205,10 +207,22 @@ class App(customtkinter.CTk):
         self.instructions_textbox.configure(state="disabled")
 
         # Buttons
-        self.lookup_button = customtkinter.CTkButton(
-            self.home_frame, text="Lookup", command=self.lookup_recipe
+        # change color theme selection
+        self.theme_button = customtkinter.CTkButton(
+            self.detail_frame, text="", command=self.lookup_recipe
         )
-        self.lookup_button.grid(row=3, column=3, padx=20, pady=10)
+        self.theme_button.grid(row=5, column=0, padx=20, pady=10)
+        # main menu button
+        self.main_menu_button = customtkinter.CTkButton(
+            self.detail_frame, text="Main Menu", command=self.main_menu
+        )
+        self.main_menu_button.grid(row=5, column=1, padx=20, pady=10)
+
+        # Quit button
+        self.quit_button = customtkinter.CTkButton(
+            self.detail_frame, text="Quit 0_o", command=self.close_program
+        )
+        self.quit_button.grid(row=5, column=2, padx=20, pady=10)
 
     def split_instructions(self, instructions):
         """Functions that removes all HTML markup and splits sentences
