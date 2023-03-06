@@ -22,7 +22,7 @@ class App(customtkinter.CTk):
         # configure window
         self.title("J-Cuisine")
         self.geometry(f"{1100}x{600}")
-
+        self.theme = "dark"
         # call functions
         self.home_screen()
 
@@ -209,7 +209,9 @@ class App(customtkinter.CTk):
         # Buttons
         # change color theme selection
         self.theme_button = customtkinter.CTkButton(
-            self.detail_frame, text="", command=self.lookup_recipe
+            self.detail_frame,
+            text="Change Color Theme",
+            command=self.change_color_theme,
         )
         self.theme_button.grid(row=5, column=0, padx=20, pady=10)
         # main menu button
@@ -230,6 +232,10 @@ class App(customtkinter.CTk):
         clean_string = re.sub("<[^<]+?>", "", instructions)
         sentences = re.split("\. ", clean_string)
         return sentences
+
+    def change_color_theme(self):
+        self.theme = "dark" if self.theme == "light" else "light"
+        customtkinter.set_appearance_mode(self.theme)
 
     def close_program(self):
         """Function that closes the program when the quit button is clicked"""
