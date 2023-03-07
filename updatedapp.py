@@ -97,25 +97,24 @@ class App(customtkinter.CTk):
         """Function that display the 6 recipes by creating GUI objects"""
         titles, images = self.read_recipes()
 
-        # configure grid layout (3x3) for view recipe
-        self.grid_columnconfigure((1, 2, 3), weight=1)
+        self.grid_columnconfigure((1, 2, 3), weight=0)
         self.grid_rowconfigure((1, 2), weight=1)
 
-        self.view_frame = customtkinter.CTkFrame(self, width=350, corner_radius=0)
-        self.view_frame.grid(row=0, column=0, rowspan=3, columnspan=4, sticky="nsew")
+        self.view_frame = customtkinter.CTkFrame(self, width=350)
+        self.view_frame.grid(
+            row=0, column=0, rowspan=3, columnspan=4, sticky="nsew", padx=15
+        )
         self.view_frame.grid_rowconfigure((0, 1, 2), weight=1)
         self.view_frame.grid_columnconfigure((0, 1, 2), weight=1)
 
         self.image_list = []
         for i in range(6):
-            self.recipe_frame = customtkinter.CTkFrame(self.view_frame, corner_radius=0)
-            self.recipe_frame.grid(row=i // 3, column=i % 3, pady=10)
+            self.recipe_frame = customtkinter.CTkFrame(self.view_frame)
+            self.recipe_frame.grid(row=i // 3, column=i % 3, pady=10, padx=10)
 
+            # makes the API think we are a browser and pull/gets the images of the recipes
             headers = {"User-Agent": "Mozilla/5.0"}
             response = requests.get(images[i], headers=headers)
-
-            # Open the image using PIL
-            # recipe_image = Image.open(io.BytesIO(response.content))
 
             self.recipe_label = customtkinter.CTkLabel(
                 self.recipe_frame,
@@ -126,12 +125,9 @@ class App(customtkinter.CTk):
             )
             self.recipe_label.pack()
             recipe_img = Image.open(io.BytesIO(response.content))
-            self.tk_image = customtkinter.CTkImage(recipe_img, size=(330, 220))
+            self.tk_image = customtkinter.CTkImage(recipe_img, size=(330, 200))
 
             self.image_list.append(recipe_img)
-
-            # Convert the PIL image to a Tkinter-compatible format
-            # self.tk_image = ImageTk.PhotoImage(recipe_image)
 
             self.frame_img = customtkinter.CTkLabel(
                 self.recipe_frame,
@@ -145,11 +141,17 @@ class App(customtkinter.CTk):
                 text="View Recipe!",
                 command=lambda btn_id=i: self.view_recipe(btn_id),
             )
-            # self.button_list.append(self.button)
-            self.recipe_button.pack(pady=5)
+
+            self.recipe_button.pack(pady=10)
 
     def view_recipe(self, btn_id):
+        """Function that creates and handels the view recipe section
+        *   :param btn_id (__int__): integer of button clicked (0 - 5)
+        """
         self.view_frame.destroy()
+
+        self.grid_columnconfigure((1, 2, 3), weight=1)
+        self.grid_rowconfigure((1, 2), weight=1)
 
         self.detail_frame = customtkinter.CTkFrame(self, width=350, corner_radius=0)
         self.detail_frame.grid(row=0, column=0, rowspan=5, columnspan=4, sticky="nsew")
@@ -162,7 +164,7 @@ class App(customtkinter.CTk):
         self.lbl_title = customtkinter.CTkLabel(
             self.detail_frame,
             text=title,
-            font=customtkinter.CTkFont(size=14, weight="bold"),
+            font=customtkinter.CTkFont(size=14, weight="bold", underline=True),
         )
         self.lbl_title.grid(row=0, column=0, pady=10)
 
@@ -177,7 +179,7 @@ class App(customtkinter.CTk):
         self.lbl_ingredients = customtkinter.CTkLabel(
             self.detail_frame,
             text=f"{title}'s Required Ingredients:",
-            font=customtkinter.CTkFont(size=14, weight="bold"),
+            font=customtkinter.CTkFont(size=14, weight="bold", underline=True),
         )
         self.lbl_ingredients.grid(row=0, column=1, columnspan=2, pady=10)
 
@@ -198,7 +200,7 @@ class App(customtkinter.CTk):
         self.lbl_instructions = customtkinter.CTkLabel(
             self.detail_frame,
             text=f"{title}'s Instructions:",
-            font=customtkinter.CTkFont(size=16, weight="bold"),
+            font=customtkinter.CTkFont(size=16, weight="bold", underline=True),
         )
         self.lbl_instructions.grid(row=3, column=0, columnspan=3, pady=(10, 0))
 
@@ -248,6 +250,7 @@ class App(customtkinter.CTk):
         return sentences
 
     def change_color_theme(self):
+        """Function that changes the color theme between dark & light mode"""
         self.theme = "dark" if self.theme == "light" else "light"
         customtkinter.set_appearance_mode(self.theme)
 
